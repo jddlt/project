@@ -52,11 +52,11 @@
       <div class="title">折返计算</div>
       <div>
         <div class="my-input dd" style="margin-bottom: 20px">
-          <label><span>保护区长度 </span><el-input v-model="baseInfo.car"></el-input></label>
-          <label><span>站台长度 </span><el-input v-model="baseInfo.long"></el-input></label>
-          <label><span>渡线长度 </span><el-input v-model="baseInfo.speed"></el-input></label>
-          <label><span>折返线长度 </span><el-input v-model="baseInfo.stoptime"></el-input></label>
-          <el-button type="success" size="small" style="float: right">计算</el-button>
+          <label><span>保护区长度 </span><el-input v-model="baseInfo4.a"></el-input></label>
+          <label><span>站台长度 </span><el-input v-model="baseInfo4.b"></el-input></label>
+          <label><span>渡线长度 </span><el-input v-model="baseInfo4.c"></el-input></label>
+          <label><span>折返线长度 </span><el-input v-model="baseInfo4.d"></el-input></label>
+          <el-button type="success" size="small" style="float: right" @click="handleBaseInfo4">计算</el-button>
         </div>
         <el-table
           :data="twoList"
@@ -117,11 +117,13 @@
 </template>
 
 <script>
+import { request } from '@/util/request'
 export default {
   components: {},
   data() {
     return {
       baseInfo: {},
+      baseInfo4: {},
       twoList: [
         { car: 't10', time: 20.5 },
         { car: 't20', time: 23.4 },
@@ -131,7 +133,24 @@ export default {
       rightNum: (Math.random() * 200).toFixed(1)
     };
   },
-  methods: {},
+  methods: {
+    handleBaseInfo4() {
+      const { a, b, c, d } = this.baseInfo4
+      if ( a && b && c && d) {
+        request({
+          url: `/wsg/zhefan/${a}/${b}/${c}/${d}`
+        }).then(res => {
+          console.log(res);
+        })
+      } else{
+          this.$message({
+            message: '参数不全',
+            type: 'error'
+          })
+      }
+      
+    }
+  },
   beforeDestroy() {}
 };
 </script>

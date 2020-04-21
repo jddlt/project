@@ -6,33 +6,42 @@
         border
         style="width: 100%;">
         <el-table-column
-        prop="id"
+        prop="tsrfhbr"
         label="ID号"
         align="center"
         min-width="15%">
         </el-table-column>
         <el-table-column
-        prop="road"
+        prop="sgrfnbr"
         label="所属路段"
         align="center"
         min-width="15%">
+          <template slot-scope="scope">
+            {{ (roadList.find(item => item.sgrfnbr == scope.row.sgrfnbr) || {}).sgname || '--' }}
+          </template>
         </el-table-column>
         <el-table-column
-        prop="start"
-        label="起始路线(Km)"
+        prop="tsname"
+        label="车站名称"
         align="center"
         min-width="15%">
         </el-table-column>
         <el-table-column
-        prop="long"
+        prop="tsposition"
         align="center"
         min-width="15%"
-        label="长度(Km)">
+        label="车站中心位胃">
         </el-table-column>
         <el-table-column
-        prop="slope"
+        prop="tsstoptime"
         align="center"
-        label="坡度(%)"
+        label="停站时间"
+        min-width="15%">
+        </el-table-column>
+        <el-table-column
+        prop="tstype"
+        align="center"
+        label="类型D/M/E"
         min-width="15%">
         </el-table-column>
         <el-table-column
@@ -42,7 +51,7 @@
         min-width="25%">
         <template slot-scope="scope">
             <!-- <el-button type="success" size='mini' @click="addList(scope.row)">添加</el-button> -->
-            <el-button type="warning" size='mini' @click="editList(scope.row)">修改坡道</el-button>
+            <!-- <el-button type="warning" size='mini' @click="editList(scope.row)">修改坡道</el-button> -->
             <el-button type="danger" size='mini' @click="deleteList(scope.row.id)">删除坡道</el-button>
         </template>
         </el-table-column>
@@ -50,74 +59,76 @@
     <el-button stype="success" style="margin-top: 15px;background-color: #67c23a;color: white" @click="addList">添加坡道</el-button>
     <el-dialog :title="currentList.id ? '编辑坡道' : '添加坡道'" :visible.sync="dialog" center width="450px">
       <el-form :model="currentList" :rules="rules" ref="currentList">
-        <el-form-item label="所属路段" :label-width="formLabelWidth" :prop="currentList.id ? '' : 'road'">
-          <el-input v-if="!currentList.id" v-model="currentList.road" autocomplete="off" placeholder="请输入所属路段"></el-input>
-          <span v-else>{{ currentList.road }}</span>
+        <el-form-item label="所属路段" :label-width="formLabelWidth" prop="sgrfnbr">
+          <el-select v-model="currentList.sgrfnbr" placeholder="请选择">
+            <el-option
+              v-for="item in roadList"
+              :key="item.sgrfnbr"
+              :label="item.sgname"
+              :value="item.sgrfnbr">
+            </el-option>
+          </el-select>
+          <!-- <el-input v-if="!currentList.id" v-model="currentList.road" autocomplete="off" placeholder="请输入所属路段"></el-input>
+          <span v-else>{{ currentList.road }}</span> -->
         </el-form-item>
-        <el-form-item label="起始位置(Km)" :label-width="formLabelWidth" prop="start">
-          <el-input v-model="currentList.start" autocomplete="off" placeholder="请输入起始位置"></el-input>
+        <el-form-item label="车站名称" :label-width="formLabelWidth" prop="tsname">
+          <el-input v-model="currentList.tsname" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item>
-        <el-form-item label="长度(Km)" :label-width="formLabelWidth" prop="long">
-          <el-input v-model="currentList.long" autocomplete="off" placeholder="请输入长度"></el-input>
+        <el-form-item label="车站中心位胃" :label-width="formLabelWidth" prop="tsposition">
+          <el-input v-model="currentList.tsposition" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item>
-        <el-form-item label="坡度(%)" :label-width="formLabelWidth" prop="slope">
-          <el-input v-model="currentList.slope" autocomplete="off" placeholder="请输入坡度"></el-input>
+        <el-form-item label="停站时间" :label-width="formLabelWidth" prop="tsstoptime">
+          <el-input v-model="currentList.tsstoptime" autocomplete="off" placeholder="请输入坡度"></el-input>
+        </el-form-item> 
+        <el-form-item label="类型D/M/E" :label-width="formLabelWidth" prop="tstype">
+          <el-radio-group v-model="currentList.tstype">
+            <el-radio label="D"> D </el-radio>
+            <el-radio label="M"> M </el-radio>
+            <el-radio label="E"> E </el-radio>
+          </el-radio-group>
+          <!-- <el-input v-model="currentList.tstype" autocomplete="off" placeholder="请输入坡度"></el-input> -->
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialog = false">取 消</el-button>
-        <el-button v-if="!currentList.id" type="primary" @click="realAddList">添 加</el-button>
-        <el-button v-else type="primary" @click="realEditList">编 辑</el-button>
+        <el-button type="primary" @click="realAddList">添 加</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
+import { getList, request } from '@/util/request'
 export default {
   components: {},
   data() {
     return {
       oneList: [],
+      roadList: [],
       currentList: {},
       dialog: false,
       formLabelWidth: '110px',
       rules: {
-        start: { required: true, message: '请输入起始位置', trigger: 'blur' },
-        road: { required: true, message: '请输入所属路段', trigger: 'blur' },
-        long: { required: true, message: '请输入长度', trigger: 'blur' },
-        slope: { required: true, message: '请输入坡度', trigger: 'blur' },
+        // tsname: { required: true, message: '不能为空', trigger: 'blur' },
+        sgrfnbr: { required: true, message: '不能为空', trigger: 'blur' },
+        tsposition: { required: true, message: '不能为空', trigger: 'blur' },
+        tsname: { required: true, message: '不能为空', trigger: 'blur' },
+        tsstoptime: { required: true, message: '不能为空', trigger: 'blur' },
+        tstype: { required: true, message: '不能为空', trigger: 'blur' },
       }
     };
   },
   mounted() {
-    const onelist = localStorage.getItem('oneList')
-    if(onelist && JSON.parse(onelist).length) {
-      this.oneList = JSON.parse(onelist)
-    } else {
-      const list = [
-        {id: 1, road: '测试路段', start: '0.55', long: '0.125', slope: '20'},
-        {id: 2, road: '测试路段', start: '0.4', long: '0.0', slope: '50'},
-        {id: 3, road: '测试路段', start: '0.0', long: '0.2', slope: '6'},
-        {id: 4, road: '测试路段', start: '0.6', long: '0.125', slope: '-5'}
-      ]
-      localStorage.setItem('oneList',JSON.stringify(list))
-      this.oneList = list
-    }
+    this.handleGetList()
   },
   methods: {
-    handleClick(tab, event) { },
-    syncList(flag = false) { 
-      localStorage.setItem('oneList',JSON.stringify(this.oneList))
-      if (flag) {
-        const deleteNum = localStorage.getItem('deleteNum')
-        if (deleteNum) {
-          localStorage.setItem('deleteNum', Number(deleteNum) + 1)
-        } else {
-          localStorage.setItem('deleteNum', 1)
-        }
-      }
+    handleGetList() {
+      getList().then(res => {
+        this.oneList = res.data.data[0].Trainstation || []
+        this.roadList = res.data.data[0].Sectiongeneral || []
+      })
     },
+    handleClick(tab, event) { },
     addList() {
       this.currentList = {}
       this.dialog = true
@@ -129,17 +140,20 @@ export default {
     realAddList() {
       this.$refs.currentList.validate(val => {
         if (!val) return
-        this.currentList = {
-          ...this.currentList,
-          id: this.oneList.length + 1 + Number((localStorage.getItem('deleteNum') || 0))
-        }
-        this.oneList.push(this.currentList)
-        this.syncList()
-        this.$message({
-          message: '添加成功',
-          type: 'success'
+        request({
+          url: '/wsg/station',
+          method: 'POST',
+          data: {
+            ...this.currentList
+          }
+        }).then(res => {
+          this.handleGetList()
+          this.$message({
+            message: '添加成功',
+            type: 'success'
+          })
+          this.dialog = false
         })
-        this.dialog = false
       })
     },
     realEditList() {
@@ -181,6 +195,9 @@ export default {
   font-weight: bold;
   font-size: 18px;
   margin-bottom: 15px;
+}
+/deep/.el-select{
+  width: 100%;
 }
 .title::before{
   content: '';

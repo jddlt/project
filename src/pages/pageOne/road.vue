@@ -6,19 +6,19 @@
       border
       style="width: 100%;">
       <el-table-column
-        prop="id"
+        prop="sgrfnbr"
         label="ID号"
         align="center"
         min-width="15%">
       </el-table-column>
       <el-table-column
-        prop="name"
+        prop="sgname"
         label="路段名称"
         align="center"
         min-width="15%">
       </el-table-column>
       <el-table-column
-        prop="detail"
+        prop="sgactive"
         label="路段描述"
         align="center"
         min-width="15%">
@@ -30,7 +30,7 @@
         min-width="25%">
         <template slot-scope="scope">
             <!-- <el-button type="success" size='mini' @click="addList(scope.row)">添加</el-button> -->
-            <el-button type="warning" size='mini' @click="editList(scope.row)">修改路段</el-button>
+            <!-- <el-button type="warning" size='mini' @click="editList(scope.row)">修改路段</el-button> -->
             <el-button type="danger" size='mini' @click="deleteList(scope.row.id)">删除路段</el-button>
         </template>
       </el-table-column>
@@ -38,43 +38,46 @@
     <el-button stype="success" style="margin-top: 15px;background-color: #67c23a;color: white" @click="addList">添加路段</el-button>
     <el-dialog :title="currentList.id ? '编辑路段' : '添加路段'" :visible.sync="dialog" center width="450px">
       <el-form :model="currentList" :rules="rules" ref="currentList">
-        <el-form-item label="路段名称" :label-width="formLabelWidth" prop="name">
-          <el-input v-model="currentList.name" autocomplete="off" placeholder="请输入路段名称"></el-input>
+        <el-form-item label="路段名称" :label-width="formLabelWidth" prop="sgname">
+          <el-input v-model="currentList.sgname" autocomplete="off" placeholder="请输入路段名称"></el-input>
         </el-form-item>
-        <el-form-item label="路段描述" :label-width="formLabelWidth" prop="detail">
-          <el-input v-model="currentList.detail" autocomplete="off" placeholder="请输入路段描述"></el-input>
+        <el-form-item label="路段描述" :label-width="formLabelWidth" prop="sgactive">
+          <el-input v-model="currentList.sgactive" autocomplete="off" placeholder="请输入路段描述"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialog = false">取 消</el-button>
-        <el-button v-if="!currentList.id" type="primary" @click="realAddList">添 加</el-button>
-        <el-button v-else type="primary" @click="realEditList">编 辑</el-button>
+        <el-button type="primary" @click="realAddList">添 加</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
+import { getList, request } from '@/util/request'
 export default {
   components: {},
   data() {
     return {
-      oneList: [
-        { id: 1, name: '盘山公路', detail: '好弯啊!!' },
-        { id: 1, name: '盘山公路', detail: '好弯啊!!' },
-        { id: 1, name: '盘山公路', detail: '好弯啊!!' }
-      ],
+      oneList: [],
       currentList: {},
       dialog: false,
       formLabelWidth: '110px',
       rules: {
-        name: { required: true, message: '请输入路段名', trigger: 'blur' },
-        detail: { required: true, message: '请输入路段描述', trigger: 'blur' }
+        sgname: { required: true, message: '请输入路段名', trigger: 'blur' },
+        sgactive: { required: true, message: '请输入路段描述', trigger: 'blur' }
       }
     };
   },
-  mounted() { },
+  mounted() { 
+    this.handleGetList()
+  },
   methods: {
+    handleGetList() {
+      getList().then(res => {
+        this.oneList = res.data.data[0].Sectiongeneral || []
+      })
+    },
     handleClick(tab, event) { },
     addList() {
       this.currentList = {}
@@ -87,16 +90,20 @@ export default {
     realAddList() {
       this.$refs.currentList.validate(val => {
         if (!val) return
-        this.currentList = {
-          ...this.currentList,
-          id: Date.now()
-        }
-        this.oneList.push(this.currentList)
-        this.$message({
-          message: '添加成功',
-          type: 'success'
+        request({
+          url: '/wsg/sect',
+          method: 'POST',
+          data: {
+            ...this.currentList
+          }
+        }).then(res => {
+          this.handleGetList()
+          this.$message({
+            message: '添加成功',
+            type: 'success'
+          })
+          this.dialog = false
         })
-        this.dialog = false
       })
     },
     realEditList() {

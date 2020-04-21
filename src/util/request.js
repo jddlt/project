@@ -12,3 +12,10 @@ export function request ({url = '', method, data = {}}) {
         }
     })
 }
+
+export function getList () {
+    return axios({
+        url: 'http://3087a4l620.zicp.vip/wsg/findAll',
+        method: 'GET'
+    })
+}

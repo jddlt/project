@@ -1,61 +1,46 @@
 <template>
   <div style="width: 100%">
-    <div class="title">路段列表</div>
+    <div class="title">曲线列表</div>
     <el-table
       :data="oneList"
       border
       style="width: 100%;">
       <el-table-column
-        prop="id"
+        prop="slrfnbr"
         label="ID号"
         align="center"
         min-width="15%">
       </el-table-column>
       <el-table-column
-        prop="key"
-        label="动车组编号"
+        prop="murfhbr"
+        label="所属动车组"
+        align="center"
+        min-width="15%">
+        <template slot-scope="scope">
+          {{ (carsList.find(item => item.murfhbr == scope.row.murfhbr) || {}).muname || '--' }}
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="slvoltageno"
+        label="电压编号"
         align="center"
         min-width="15%">
       </el-table-column>
       <el-table-column
-        prop="name"
-        label="列车名称"
+        prop="slspeed"
+        label="速度"
         align="center"
         min-width="15%">
       </el-table-column>
       <el-table-column
-        prop="type"
-        label="列车类型"
+        prop="slpower"
+        label="力"
         align="center"
         min-width="15%">
       </el-table-column>
       <el-table-column
-        prop="weight"
-        label="列车重量"
-        align="center"
-        min-width="15%">
-      </el-table-column>
-      <el-table-column
-        prop="long"
-        label="列车长度"
-        align="center"
-        min-width="15%">
-      </el-table-column>
-      <el-table-column
-        prop="lnumber"
-        label="列车数量"
-        align="center"
-        min-width="15%">
-      </el-table-column>t
-      <el-table-column
-        prop="tnumber"
-        label="拖车数量"
-        align="center"
-        min-width="15%">
-      </el-table-column>
-      <el-table-column
-        prop="speed"
-        label="列车最大速度"
+        prop="sltype"
+        label="类型"
         align="center"
         min-width="15%">
       </el-table-column>
@@ -63,78 +48,79 @@
         prop="slope"
         align="center"
         label="操作"
-        min-width="25%">
+        min-width="15%">
         <template slot-scope="scope">
             <!-- <el-button type="success" size='mini' @click="addList(scope.row)">添加</el-button> -->
-            <el-button type="warning" size='mini' @click="editList(scope.row)">修改动车</el-button>
+            <!-- <el-button type="warning" size='mini' @click="editList(scope.row)">修改动车</el-button> -->
             <el-button type="danger" size='mini' @click="deleteList(scope.row.id)">删除动车</el-button>
         </template>
       </el-table-column>
     </el-table>
     <el-button stype="success" style="margin-top: 15px;background-color: #67c23a;color: white" @click="addList">添加动车</el-button>
-    <el-dialog :title="currentList.id ? '编辑路段' : '添加路段'" :visible.sync="dialog" center width="450px">
+    <el-dialog :title="currentList.id ? '编辑路段' : '添加列车'" :visible.sync="dialog" center width="450px">
       <el-form :model="currentList" :rules="rules" ref="currentList">
-        <el-form-item label="动车组编号" :label-width="formLabelWidth" prop="key">
-          <el-input v-model="currentList.key" autocomplete="off" placeholder="请输入"></el-input>
+        <el-form-item label="所属动车组" :label-width="formLabelWidth" prop="murfhbr">
+          <el-select v-model="currentList.murfhbr" placeholder="请选择">
+            <el-option
+              v-for="item in carsList"
+              :key="item.murfhbr"
+              :label="item.muname"
+              :value="item.murfhbr">
+            </el-option>
+          </el-select>
+          <!-- <el-input v-model="currentList.murfhbr" autocomplete="off" placeholder="请输入"></el-input> -->
         </el-form-item>
-        <el-form-item label="列车名称" :label-width="formLabelWidth" prop="name">
-          <el-input v-model="currentList.name" autocomplete="off" placeholder="请输入"></el-input>
+        <el-form-item label="电压编号" :label-width="formLabelWidth" prop="slvoltageno">
+          <el-input v-model="currentList.slvoltageno" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item>
-        <el-form-item label="列车类型" :label-width="formLabelWidth" prop="type">
-          <el-input v-model="currentList.type" autocomplete="off" placeholder="请输入"></el-input>
+        <el-form-item label="速度" :label-width="formLabelWidth" prop="slspeed">
+          <el-input v-model="currentList.slspeed" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item>
-        <el-form-item label="列车重量" :label-width="formLabelWidth" prop="weight">
-          <el-input v-model="currentList.weight" autocomplete="off" placeholder="请输入"></el-input>
+        <el-form-item label="力" :label-width="formLabelWidth" prop="slpower">
+          <el-input v-model="currentList.slpower" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item>
-        <el-form-item label="列车长度" :label-width="formLabelWidth" prop="long">
-          <el-input v-model="currentList.long" autocomplete="off" placeholder="请输入"></el-input>
-        </el-form-item>
-        <el-form-item label="列车数量" :label-width="formLabelWidth" prop="lnumber">
-          <el-input v-model="currentList.lnumber" autocomplete="off" placeholder="请输入"></el-input>
-        </el-form-item>
-        <el-form-item label="拖车数量" :label-width="formLabelWidth" prop="tnumber">
-          <el-input v-model="currentList.tnumber" autocomplete="off" placeholder="请输入"></el-input>
-        </el-form-item>
-        <el-form-item label="列车最大速度" :label-width="formLabelWidth" prop="speed">
-          <el-input v-model="currentList.speed" autocomplete="off" placeholder="请输入"></el-input>
+        <el-form-item label="类型" :label-width="formLabelWidth" prop="sltype">
+          <el-input v-model="currentList.sltype" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialog = false">取 消</el-button>
-        <el-button v-if="!currentList.id" type="primary" @click="realAddList">添 加</el-button>
-        <el-button v-else type="primary" @click="realEditList">编 辑</el-button>
+        <el-button type="primary" @click="realAddList">添 加</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
+import { getList, request } from '@/util/request'
 export default {
   components: {},
   data() {
     return {
-      oneList: [
-        { id: 1, key: '4396', name: '盘山公路', type: '和谐号', weight: 20, long: 500, lnumber: 3, tnumber: 5, speed: 120 },
-        { id: 2, key: '4396', name: '盘山公路', type: '和谐号', weight: 20, long: 500, lnumber: 3, tnumber: 5, speed: 120 },
-        { id: 3, key: '4396', name: '盘山公路', type: '和谐号', weight: 20, long: 500, lnumber: 3, tnumber: 5, speed: 120 },
-      ],
+      oneList: [],
+      carsList: [],
       currentList: {},
       dialog: false,
       formLabelWidth: '110px',
       rules: {
-        key: { required: true, message: '不能为空', trigger: 'blur' },
-        name: { required: true, message: '不能为空', trigger: 'blur' },
-        type: { required: true, message: '不能为空', trigger: 'blur' },
-        long: { required: true, message: '不能为空', trigger: 'blur' },
-        weight: { required: true, message: '不能为空', trigger: 'blur' },
-        lnumber: { required: true, message: '不能为空', trigger: 'blur' },
-        tnumber: { required: true, message: '不能为空', trigger: 'blur' },
-        speed: { required: true, message: '不能为空', trigger: 'blur' }
+        murfhbr: { required: true, message: '不能为空', trigger: 'blur' },
+        slvoltageno: { required: true, message: '不能为空', trigger: 'blur' },
+        slspeed: { required: true, message: '不能为空', trigger: 'blur' },
+        slpower: { required: true, message: '不能为空', trigger: 'blur' },
+        sltype: { required: true, message: '不能为空', trigger: 'blur' },
       }
     };
   },
-  mounted() { },
+  mounted() { 
+    this.handleGetList()
+  },
   methods: {
+    handleGetList() {
+      getList().then(res => {
+        this.oneList = res.data.data[0].Specialine || [],
+        this.carsList = res.data.data[0].Multipleunit || []
+      })
+    },
     handleClick(tab, event) { },
     addList() {
       this.currentList = {}
@@ -147,28 +133,26 @@ export default {
     realAddList() {
       this.$refs.currentList.validate(val => {
         if (!val) return
-        this.currentList = {
-          ...this.currentList,
-          id: Date.now()
-        }
-        this.oneList.push(this.currentList)
-        this.$message({
-          message: '添加成功',
-          type: 'success'
+        request({
+          url: '/wsg/spline',
+          method: 'POST',
+          data: {
+            ...this.currentList
+          }
+        }).then(res => {
+          this.handleGetList()
+          this.$message({
+            message: '添加成功',
+            type: 'success'
+          })
+          this.dialog = false
         })
-        this.dialog = false
-      })
-    },
-    realEditList() {
-      this.$refs.currentList.validate(val => {
-        if (!val) return
-        const index = this.oneList.findIndex(item => item.id == this.currentList.id)
-        this.oneList.splice(index, 1, this.currentList)
-        this.$message({
-          message: '编辑成功',
-          type: 'success'
-        })
-        this.dialog = false
+
+        // this.currentList = {
+        //   ...this.currentList,
+        //   id: Date.now()
+        // }
+        // this.oneList.push(this.currentList)
       })
     },
     deleteList(id) {
@@ -177,6 +161,13 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        // request({
+        //   url: '/wsg/train',
+        //   methods: 'POST',
+        //   data: {
+        //     ...this.currentList
+        //   }
+        // })
         const index = this.oneList.findIndex(item => item.id == id)
         this.oneList.splice(index, 1)
         this.$message({
@@ -196,6 +187,9 @@ export default {
   font-weight: bold;
   font-size: 18px;
   margin-bottom: 15px;
+}
+/deep/.el-select{
+  width: 100%;
 }
 .title::before{
   content: '';
