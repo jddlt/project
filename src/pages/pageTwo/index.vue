@@ -4,11 +4,28 @@
       <div class="input-block">
         <div class="title">基础资料</div>
         <div class="my-input">
-          <div><span style="width: 150px; display: inline-block">列车: </span><el-input v-model="baseInfo.car" placeholder="请选择列车"></el-input></div>
-          <div><span style="width: 150px; display: inline-block">列车长度(m): </span><el-input v-model="baseInfo.long" placeholder="请输入列车长度"></el-input></div>
-          <div><span style="width: 150px; display: inline-block">列车速度(m): </span><el-input v-model="baseInfo.speed" placeholder="请输入列车速度"></el-input></div>
-          <div><span style="width: 150px; display: inline-block">制动响应时间(S): </span><el-input v-model="baseInfo.stoptime" placeholder="请输入制动响应时间"></el-input></div>
-          <div><span style="width: 150px; display: inline-block">牵引切断时间(S): </span><el-input v-model="baseInfo.slicetime" placeholder="请输入牵引切断时间"></el-input></div>
+          <div><span style="width: 150px; display: inline-block">请选择列车: </span>
+            <el-select v-model="car" placeholder="请选择列车" @change="handleChange">
+              <el-option
+                v-for="item in carList"
+                :key="item.tirfnbr"
+                :label="item.tmame"
+                :value="item.tirfnbr">
+              </el-option>
+            </el-select>
+          </div>
+          <div style="margin: 18px 0;"><span style="width: 150px; display: inline-block">列车长度(m): </span>
+            {{ currentList.tilength || '-' }}
+          </div>
+          <div style="margin: 18px 0;"><span style="width: 150px; display: inline-block">列车速度(m): </span>
+            {{ currentList.tiaimspeed || '-' }}
+          </div>
+          <div style="margin: 18px 0;"><span style="width: 150px; display: inline-block">制动响应时间(S): </span>
+            {{ currentList.tiaimspeed ? '2' : '-' }}
+          </div>
+          <div style="margin: 18px 0;"><span style="width: 150px; display: inline-block">牵引切断时间(S): </span>
+            {{ currentList.tiaimspeed ? '0.5' : '-' }}
+          </div>
         </div>
       </div>
       <div class="input-block">
@@ -16,14 +33,14 @@
         <div class="my-input">
           <div>
             <span style="width: 150px; display: inline-block">安全防护距离(m): </span>
-            <el-input v-model="baseInfo.long" placeholder="请输入列车长度"></el-input>
+            <el-input v-model="baseInfo2.long" placeholder="请输入列车长度"></el-input>
           </div>
           <div>
             <span style="width: 200px; display: inline-block; margin-top: 30px">区域追踪间隔时间时间(S): </span>
             <span style="color: red">{{ leftNum }}</span>
           </div>
           <div>
-            <el-button type="success" style="margin-top: 72px" @click="leftNum = (Math.random() * 100).toFixed(1)"> 计算 </el-button>
+            <el-button type="success" style="margin-top: 72px" @click="handleBaseInfo2"> 计算 </el-button>
           </div>
         </div>
       </div>
@@ -32,18 +49,18 @@
         <div class="my-input">
           <div>
             <span style="width: 150px; display: inline-block">车站停车距离(m): </span>
-            <el-input v-model="baseInfo.long" placeholder="请输入列车长度"></el-input>
+            <el-input v-model="baseInfo3.stationLength" placeholder="请输入车站停车距离"></el-input>
           </div>
           <div>
             <span style="width: 150px; display: inline-block">保护区距离(m): </span>
-            <el-input v-model="baseInfo.long" placeholder="请输入列车长度"></el-input>
+            <el-input v-model="baseInfo3.saveLength" placeholder="请输入保护区距离"></el-input>
           </div>
           <div>
             <span style="width: 200px; display: inline-block; margin-top: 30px">车站追踪间隔时间时间(S): </span>
             <span style="color: red">{{ rightNum }}</span>
           </div>
           <div>
-            <el-button type="success" style="margin-top: 30px" @click="rightNum = (Math.random() * 200).toFixed(1)"> 计算 </el-button>
+            <el-button type="success" style="margin-top: 30px" @click="handleBaseInfo3"> 计算 </el-button>
           </div>
         </div>
       </div>
@@ -56,10 +73,11 @@
           <label><span>站台长度 </span><el-input v-model="baseInfo4.b"></el-input></label>
           <label><span>渡线长度 </span><el-input v-model="baseInfo4.c"></el-input></label>
           <label><span>折返线长度 </span><el-input v-model="baseInfo4.d"></el-input></label>
+          <label style="margin-left: 30px; color: red"><span>折返时间： </span><span>{{ time || '-' }}</span></label>
           <el-button type="success" size="small" style="float: right" @click="handleBaseInfo4">计算</el-button>
         </div>
         <el-table
-          :data="twoList"
+          :data="computeList"
           border
           style="width: 100%;">
           <el-table-column
@@ -117,30 +135,44 @@
 </template>
 
 <script>
-import { request } from '@/util/request'
+import { request, getList } from '@/util/request'
 export default {
   components: {},
   data() {
     return {
       baseInfo: {},
+      baseInfo2: {},
+      baseInfo3: {},
+      currentList: {},
+      time: '',
+      car: '',
       baseInfo4: {},
-      twoList: [
-        { car: 't10', time: 20.5 },
-        { car: 't20', time: 23.4 },
-        { car: 't30', time: 34.6 },
-      ],
-      leftNum: (Math.random() * 100).toFixed(1),
-      rightNum: (Math.random() * 200).toFixed(1)
+      computeList: [],
+      carList: [],
+      leftNum: '-',
+      rightNum: '-'
     };
   },
+  mounted() {
+    getList().then(res => {
+      // this.oneList = res.data.data[0].Traininfo || [],
+      this.carList = res.data.data[0].Traininfo || []
+      console.log(this.carList);
+      
+    })
+  },
   methods: {
-    handleBaseInfo4() {
-      const { a, b, c, d } = this.baseInfo4
-      if ( a && b && c && d) {
+    handleChange(e) {
+      const item = this.carList.find(item => item.tirfnbr === e)
+      this.currentList = item
+    },
+    handleBaseInfo2() {
+      const { long } = this.baseInfo2
+      if (long) {
         request({
-          url: `/wsg/zhefan/${a}/${b}/${c}/${d}`
+          url: `/wsg/section/${long}`
         }).then(res => {
-          console.log(res);
+          this.leftNum = res.data.data
         })
       } else{
           this.$message({
@@ -148,7 +180,47 @@ export default {
             type: 'error'
           })
       }
-      
+    },
+    handleBaseInfo3() {
+      const { stationLength, saveLength } = this.baseInfo3
+      if (stationLength && saveLength) {
+        request({
+          url: `/wsg/station/${stationLength}/${saveLength}`
+        }).then(res => {
+          this.rightNum = res.data.data
+        })
+      } else{
+          this.$message({
+            message: '参数不全',
+            type: 'error'
+          })
+      }
+    },
+    handleBaseInfo4() {
+      const { a, b, c, d } = this.baseInfo4
+      if ( a && b && c && d) {
+        this.time = ''
+        request({
+          url: `/wsg/zhefan/${a}/${b}/${c}/${d}`
+        }).then(res => {
+          const arr = []
+          Object.entries(res.data.data[0]).forEach(item => {
+            const [key, value] = item
+            if (key !== '折返时间'){
+              arr.push({ car: key, time: value })
+            } else {
+              this.time = value
+            }
+          })
+          this.computeList = arr
+          console.log(this.computeList);
+        })
+      } else{
+          this.$message({
+            message: '参数不全',
+            type: 'error'
+          })
+      }
     }
   },
   beforeDestroy() {}

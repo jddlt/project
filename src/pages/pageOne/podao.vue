@@ -58,7 +58,7 @@
         <template slot-scope="scope">
             <!-- <el-button type="success" size='mini' @click="addList(scope.row)">添加</el-button> -->
             <!-- <el-button type="warning" size='mini' @click="editList(scope.row)">修改坡道</el-button> -->
-            <el-button type="danger" size='mini' @click="deleteList(scope.row.id)">删除坡道</el-button>
+            <el-button type="danger" size='mini' @click="deleteList(scope.row.lfrfnbr)">删除</el-button>
         </template>
         </el-table-column>
     </el-table>
@@ -179,18 +179,21 @@ export default {
       })
     },
     deleteList(id) {
-      this.$confirm('此操作将删除该坡道, 是否继续?', '提示', {
+      this.$confirm('此操作将删除该坡道，是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        const index = this.oneList.findIndex(item => item.id == id)
-        this.oneList.splice(index, 1)
-        this.syncList(true)
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        });
+        request({
+          url: `/wsg/deleteByLand/${id}`,
+          data: {}
+        }).then(() => {
+          this.handleGetList()
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+        })
       })
     }
   },

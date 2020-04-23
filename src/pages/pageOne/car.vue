@@ -70,7 +70,7 @@
         <template slot-scope="scope">
             <!-- <el-button type="success" size='mini' @click="addList(scope.row)">添加</el-button> -->
             <!-- <el-button type="warning" size='mini' @click="editList(scope.row)">修改动车</el-button> -->
-            <el-button type="danger" size='mini' @click="deleteList(scope.row.id)">删除动车</el-button>
+            <el-button type="danger" size='mini' @click="deleteList(scope.row.tirfnbr)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -186,24 +186,21 @@ export default {
       })
     },
     deleteList(id) {
-      this.$confirm('此操作将删除该坡道, 是否继续?', '提示', {
+      this.$confirm('此操作将删除该列车， 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        // request({
-        //   url: '/wsg/train',
-        //   methods: 'POST',
-        //   data: {
-        //     ...this.currentList
-        //   }
-        // })
-        const index = this.oneList.findIndex(item => item.id == id)
-        this.oneList.splice(index, 1)
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        });
+        request({
+          url: `/wsg/deleteByTrain/${id}`,
+          data: {}
+        }).then(() => {
+          this.handleGetList()
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+        })
       })
     }
   },

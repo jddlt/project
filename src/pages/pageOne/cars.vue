@@ -12,7 +12,7 @@
         min-width="15%">
       </el-table-column>
       <el-table-column
-        prop="mumame"
+        prop="muname"
         label="动车组名称"
         align="center"
         min-width="15%">
@@ -55,7 +55,7 @@
         <template slot-scope="scope">
             <!-- <el-button type="success" size='mini' @click="addList(scope.row)">添加</el-button> -->
             <!-- <el-button type="warning" size='mini' @click="editList(scope.row)">修改动车</el-button> -->
-            <el-button type="danger" size='mini' @click="deleteList(scope.row.id)">删除动车</el-button>
+            <el-button type="danger" size='mini' @click="deleteList(scope.row.murfhbr)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -66,7 +66,7 @@
           <el-input v-model="currentList.murfhbr" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item> -->
         <el-form-item label="动车组名称" :label-width="formLabelWidth" prop="mumame">
-          <el-input v-model="currentList.mumame" autocomplete="off" placeholder="请输入"></el-input>
+          <el-input v-model="currentList.muname" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item label="动车组类型" :label-width="formLabelWidth" prop="mutype">
           <el-input v-model="currentList.mutype" autocomplete="off" placeholder="请输入"></el-input>
@@ -151,24 +151,21 @@ export default {
       })
     },
     deleteList(id) {
-      this.$confirm('此操作将删除该坡道, 是否继续?', '提示', {
+      this.$confirm('此操作将删除该动车组, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        // request({
-        //   url: '/wsg/train',
-        //   methods: 'POST',
-        //   data: {
-        //     ...this.currentList
-        //   }
-        // })
-        const index = this.oneList.findIndex(item => item.id == id)
-        this.oneList.splice(index, 1)
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        });
+        request({
+          url: `/wsg/deleteByMu/${id}`,
+          data: {}
+        }).then(() => {
+          this.handleGetList()
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+        })
       })
     }
   },
