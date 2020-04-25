@@ -56,8 +56,8 @@
         </template>
         </el-table-column>
     </el-table>
-    <el-button stype="success" style="margin-top: 15px;background-color: #67c23a;color: white" @click="addList">添加坡道</el-button>
-    <el-dialog :title="currentList.id ? '编辑坡道' : '添加坡道'" :visible.sync="dialog" center width="450px">
+    <el-button stype="success" style="margin-top: 15px;background-color: #67c23a;color: white" @click="addList">添加车站</el-button>
+    <el-dialog :title="currentList.id ? '编辑坡道' : '添加车站'" :visible.sync="dialog" center width="450px">
       <el-form :model="currentList" :rules="rules" ref="currentList">
         <el-form-item label="所属路段" :label-width="formLabelWidth" prop="sgrfnbr">
           <el-select v-model="currentList.sgrfnbr" placeholder="请选择">
