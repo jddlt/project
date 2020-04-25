@@ -61,7 +61,7 @@
       </el-menu>
       <div style="padding: 20px; box-size: border-box; width: 100%">
         <router-view />
-      </div>3
+      </div>
     </div>
   </div>
 </template>
