@@ -1,49 +1,43 @@
 <template>
   <div style="width: 100%">
-    <div class="title">线路列表</div>
+    <div class="title">车站列表</div>
     <el-table
-      :data="oneList"
-      border
-      style="width: 100%;">
-      <el-table-column
-        prop="sgrfnbr"
-        label="ID号"
+        :data="oneList"
+        border
+        style="width: 100%;">
+        <el-table-column
+        prop="tsname"
+        label="折返停车时间"
         align="center"
         min-width="15%">
-      </el-table-column>
-      <el-table-column
-        prop="sgname"
-        label="线路名称"
+        </el-table-column>
+        <el-table-column
+        prop="tsstoptime"
+        label="进路解锁与办理"
         align="center"
         min-width="15%">
-      </el-table-column>
-      <el-table-column
-        prop="sgactive"
-        label="线路描述"
-        align="center"
-        min-width="15%">
-      </el-table-column>
-      <el-table-column
+        </el-table-column>
+        <el-table-column
         prop="slope"
         align="center"
         label="操作"
         min-width="25%">
         <template slot-scope="scope">
             <!-- <el-button type="success" size='mini' @click="addList(scope.row)">添加</el-button> -->
-            <!-- <el-button type="warning" size='mini' @click="editList(scope.row)">修改线路</el-button> -->
-            <el-button type="danger" size='mini' @click="deleteList(scope.row.sgrfnbr)">删除</el-button>
+            <!-- <el-button type="warning" size='mini' @click="editList(scope.row)">修改坡道</el-button> -->
+            <el-button type="danger" size='mini' @click="deleteList(scope.row.tsrfhbr)">删除</el-button>
         </template>
-      </el-table-column>
+        </el-table-column>
     </el-table>
-    <el-button stype="success" style="margin-top: 15px;background-color: #67c23a;color: white" @click="addList">添加线路</el-button>
-    <el-dialog :title="currentList.id ? '编辑线路' : '添加线路'" :visible.sync="dialog" center width="450px">
+    <el-button stype="success" style="margin-top: 15px;background-color: #67c23a;color: white" @click="addList">添加车站</el-button>
+    <el-dialog :title="currentList.id ? '编辑坡道' : '添加车站'" :visible.sync="dialog" center width="450px">
       <el-form :model="currentList" :rules="rules" ref="currentList">
-        <el-form-item label="线路名称" :label-width="formLabelWidth" prop="sgname">
-          <el-input v-model="currentList.sgname" autocomplete="off" placeholder="请输入线路名称"></el-input>
+        <el-form-item label="折返停车时间" :label-width="formLabelWidth" prop="tsname">
+          <el-input v-model="currentList.tsname" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item>
-        <el-form-item label="线路描述" :label-width="formLabelWidth" prop="sgactive">
-          <el-input v-model="currentList.sgactive" autocomplete="off" placeholder="请输入线路描述"></el-input>
-        </el-form-item>
+        <el-form-item label="进路解锁与办理" :label-width="formLabelWidth" prop="tsstoptime">
+          <el-input v-model="currentList.tsstoptime" autocomplete="off" placeholder="请输入坡度"></el-input>
+        </el-form-item> 
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialog = false">取 消</el-button>
@@ -60,22 +54,24 @@ export default {
   data() {
     return {
       oneList: [],
+      roadList: [],
       currentList: {},
       dialog: false,
-      formLabelWidth: '110px',
+      formLabelWidth: '130px',
       rules: {
-        sgname: { required: true, message: '请输入线路名', trigger: 'blur' },
-        sgactive: { required: true, message: '请输入线路描述', trigger: 'blur' }
+        tsname: { required: true, message: '不能为空', trigger: 'blur' },
+        tsstoptime: { required: true, message: '不能为空', trigger: 'blur' },
       }
     };
   },
-  mounted() { 
+  mounted() {
     this.handleGetList()
   },
   methods: {
     handleGetList() {
       getList().then(res => {
-        this.oneList = res.data.data[0].Sectiongeneral || []
+        this.oneList = res.data.data[0].Trainstation || []
+        this.roadList = res.data.data[0].Sectiongeneral || []
       })
     },
     handleClick(tab, event) { },
@@ -91,7 +87,7 @@ export default {
       this.$refs.currentList.validate(val => {
         if (!val) return
         request({
-          url: '/wsg/sect',
+          url: '/wsg/station',
           method: 'POST',
           data: {
             ...this.currentList
@@ -111,6 +107,7 @@ export default {
         if (!val) return
         const index = this.oneList.findIndex(item => item.id == this.currentList.id)
         this.oneList.splice(index, 1, this.currentList)
+        this.syncList()
         this.$message({
           message: '编辑成功',
           type: 'success'
@@ -119,13 +116,13 @@ export default {
       })
     },
     deleteList(id) {
-      this.$confirm('此操作将删除该线路， 是否继续?', '提示', {
+      this.$confirm('此操作将删除该车站， 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         request({
-          url: `/wsg/deleteBySect/${id}`,
+          url: `/wsg/deleteByStation/${id}`,
           data: {}
         }).then(() => {
           this.handleGetList()
@@ -147,6 +144,9 @@ export default {
   font-weight: bold;
   font-size: 18px;
   margin-bottom: 15px;
+}
+/deep/.el-select{
+  width: 100%;
 }
 .title::before{
   content: '';

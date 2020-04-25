@@ -30,7 +30,7 @@
         prop="tsposition"
         align="center"
         min-width="15%"
-        label="车站中心位胃">
+        label="折返停车时间">
         </el-table-column>
         <el-table-column
         prop="tsstoptime"
@@ -38,12 +38,12 @@
         label="停站时间"
         min-width="15%">
         </el-table-column>
-        <el-table-column
+        <!-- <el-table-column
         prop="tstype"
         align="center"
         label="类型D/M/E"
         min-width="15%">
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column
         prop="slope"
         align="center"
@@ -74,20 +74,19 @@
         <el-form-item label="车站名称" :label-width="formLabelWidth" prop="tsname">
           <el-input v-model="currentList.tsname" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item>
-        <el-form-item label="车站中心位胃" :label-width="formLabelWidth" prop="tsposition">
+        <el-form-item label="折返停车时间" :label-width="formLabelWidth" prop="tsposition">
           <el-input v-model="currentList.tsposition" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item label="停站时间" :label-width="formLabelWidth" prop="tsstoptime">
           <el-input v-model="currentList.tsstoptime" autocomplete="off" placeholder="请输入坡度"></el-input>
         </el-form-item> 
-        <el-form-item label="类型D/M/E" :label-width="formLabelWidth" prop="tstype">
+        <!-- <el-form-item label="类型D/M/E" :label-width="formLabelWidth" prop="tstype">
           <el-radio-group v-model="currentList.tstype">
             <el-radio label="D"> D </el-radio>
             <el-radio label="M"> M </el-radio>
             <el-radio label="E"> E </el-radio>
           </el-radio-group>
-          <!-- <el-input v-model="currentList.tstype" autocomplete="off" placeholder="请输入坡度"></el-input> -->
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialog = false">取 消</el-button>
@@ -114,7 +113,7 @@ export default {
         tsposition: { required: true, message: '不能为空', trigger: 'blur' },
         tsname: { required: true, message: '不能为空', trigger: 'blur' },
         tsstoptime: { required: true, message: '不能为空', trigger: 'blur' },
-        tstype: { required: true, message: '不能为空', trigger: 'blur' },
+        // tstype: { required: true, message: '不能为空', trigger: 'blur' },
       }
     };
   },

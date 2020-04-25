@@ -1,9 +1,9 @@
 <template>
   <div class="main">
-    <header class="head">移动闭塞原理的列车追踪运行仿真</header>
+    <header class="head">移动闭塞原理的列车追踪间隔仿真</header>
     <div id="app" class="page">
       <el-menu
-        default-active="1-1"
+        default-active="1-2"
         class="el-menu-vertical-demo"
         background-color="#545c64"
         text-color="#fff"
@@ -15,11 +15,11 @@
             <i class="el-icon-location"></i>
             <span>基础数据模块</span>
           </template>
-          <router-link to="podao" tag="div" index="1-1">
+          <!-- <router-link to="podao" tag="div" index="1-1">
             <el-menu-item index="1-1">
                 <span slot="title">坡道列表</span>
             </el-menu-item>
-          </router-link>
+          </router-link> -->
           <router-link to="car" tag="div">
             <el-menu-item index="1-2">
                 <span slot="title">列车列表</span>
@@ -35,11 +35,11 @@
                 <span slot="title">路段列表</span>
             </el-menu-item>
           </router-link>
-          <router-link to="quxian" tag="div">
+          <!-- <router-link to="quxian" tag="div">
             <el-menu-item index="1-5">
                 <span slot="title">曲线列表</span>
             </el-menu-item>
-          </router-link>
+          </router-link> -->
           <router-link to="station" tag="div">
             <el-menu-item index="1-6">
                 <span slot="title">车站列表</span>
@@ -55,7 +55,7 @@
         <router-link to="run" tag="div">
           <el-menu-item index="3">
             <i class="el-icon-user-solid"></i>
-            <span slot="title">列车运行仿真</span>
+            <span slot="title">列车间隔仿真</span>
           </el-menu-item>
         </router-link>
       </el-menu>

@@ -1,49 +1,46 @@
 <template>
   <div style="width: 100%">
-    <div class="title">列车列表</div>
+    <div class="title">曲线列表</div>
     <el-table
       :data="oneList"
       border
       style="width: 100%;">
       <el-table-column
+        prop="slrfnbr"
+        label="ID号"
+        align="center"
+        min-width="15%">
+      </el-table-column>
+      <el-table-column
         prop="murfhbr"
-        label="动车组编号"
+        label="所属动车组"
+        align="center"
+        min-width="15%">
+        <template slot-scope="scope">
+          {{ (carsList.find(item => item.murfhbr == scope.row.murfhbr) || {}).muname || '--' }}
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="slvoltageno"
+        label="电压编号"
         align="center"
         min-width="15%">
       </el-table-column>
       <el-table-column
-        prop="muname"
-        label="动车组名称"
+        prop="slspeed"
+        label="速度"
         align="center"
         min-width="15%">
       </el-table-column>
       <el-table-column
-        prop="mutype"
-        label="动车组类型"
+        prop="slpower"
+        label="力"
         align="center"
         min-width="15%">
       </el-table-column>
       <el-table-column
-        prop="muegnum"
-        label="引擎数量"
-        align="center"
-        min-width="15%">
-      </el-table-column>
-      <el-table-column
-        prop="muparaa"
-        label="参数a"
-        align="center"
-        min-width="15%">
-      </el-table-column>
-      <el-table-column
-        prop="muparab"
-        label="参数b"
-        align="center"
-        min-width="15%">
-      </el-table-column>
-      <el-table-column
-        prop="muparac"
-        label="参数c"
+        prop="sltype"
+        label="类型"
         align="center"
         min-width="15%">
       </el-table-column>
@@ -55,33 +52,35 @@
         <template slot-scope="scope">
             <!-- <el-button type="success" size='mini' @click="addList(scope.row)">添加</el-button> -->
             <!-- <el-button type="warning" size='mini' @click="editList(scope.row)">修改动车</el-button> -->
-            <el-button type="danger" size='mini' @click="deleteList(scope.row.murfhbr)">删除</el-button>
+            <el-button type="danger" size='mini' @click="deleteList(scope.row.slrfnbr)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <el-button stype="success" style="margin-top: 15px;background-color: #67c23a;color: white" @click="addList">添加动车</el-button>
-    <el-dialog title="添加动车组" :visible.sync="dialog" center width="450px">
+    <el-dialog :title="currentList.id ? '编辑路段' : '添加列车'" :visible.sync="dialog" center width="450px">
       <el-form :model="currentList" :rules="rules" ref="currentList">
-        <!-- <el-form-item label="动车组编号" :label-width="formLabelWidth" prop="murfhbr">
-          <el-input v-model="currentList.murfhbr" autocomplete="off" placeholder="请输入"></el-input>
-        </el-form-item> -->
-        <el-form-item label="动车组名称" :label-width="formLabelWidth" prop="muname">
-          <el-input v-model="currentList.muname" autocomplete="off" placeholder="请输入"></el-input>
+        <el-form-item label="所属动车组" :label-width="formLabelWidth" prop="murfhbr">
+          <el-select v-model="currentList.murfhbr" placeholder="请选择">
+            <el-option
+              v-for="item in carsList"
+              :key="item.murfhbr"
+              :label="item.muname"
+              :value="item.murfhbr">
+            </el-option>
+          </el-select>
+          <!-- <el-input v-model="currentList.murfhbr" autocomplete="off" placeholder="请输入"></el-input> -->
         </el-form-item>
-        <el-form-item label="动车组类型" :label-width="formLabelWidth" prop="mutype">
-          <el-input v-model="currentList.mutype" autocomplete="off" placeholder="请输入"></el-input>
+        <el-form-item label="电压编号" :label-width="formLabelWidth" prop="slvoltageno">
+          <el-input v-model="currentList.slvoltageno" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item>
-        <el-form-item label="引擎数量" :label-width="formLabelWidth" prop="muegnum">
-          <el-input v-model="currentList.muegnum" autocomplete="off" placeholder="请输入"></el-input>
+        <el-form-item label="速度" :label-width="formLabelWidth" prop="slspeed">
+          <el-input v-model="currentList.slspeed" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item>
-        <el-form-item label="参数a" :label-width="formLabelWidth" prop="muparaa">
-          <el-input v-model="currentList.muparaa" autocomplete="off" placeholder="请输入"></el-input>
+        <el-form-item label="力" :label-width="formLabelWidth" prop="slpower">
+          <el-input v-model="currentList.slpower" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item>
-        <el-form-item label="参数b" :label-width="formLabelWidth" prop="muparab">
-          <el-input v-model="currentList.muparab" autocomplete="off" placeholder="请输入"></el-input>
-        </el-form-item>
-        <el-form-item label="参数c" :label-width="formLabelWidth" prop="muparac">
-          <el-input v-model="currentList.muparac" autocomplete="off" placeholder="请输入"></el-input>
+        <el-form-item label="类型" :label-width="formLabelWidth" prop="sltype">
+          <el-input v-model="currentList.sltype" autocomplete="off" placeholder="请输入"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -99,17 +98,16 @@ export default {
   data() {
     return {
       oneList: [],
+      carsList: [],
       currentList: {},
       dialog: false,
       formLabelWidth: '110px',
       rules: {
-        // murfhbr: { required: true, message: '不能为空', trigger: 'blur' },
-        muname: { required: true, message: '不能为空', trigger: 'blur' },
-        mutype: { required: true, message: '不能为空', trigger: 'blur' },
-        muegnum: { required: true, message: '不能为空', trigger: 'blur' },
-        muparaa: { required: true, message: '不能为空', trigger: 'blur' },
-        muparab: { required: true, message: '不能为空', trigger: 'blur' },
-        muparac: { required: true, message: '不能为空', trigger: 'blur' },
+        murfhbr: { required: true, message: '不能为空', trigger: 'blur' },
+        slvoltageno: { required: true, message: '不能为空', trigger: 'blur' },
+        slspeed: { required: true, message: '不能为空', trigger: 'blur' },
+        slpower: { required: true, message: '不能为空', trigger: 'blur' },
+        sltype: { required: true, message: '不能为空', trigger: 'blur' },
       }
     };
   },
@@ -119,7 +117,8 @@ export default {
   methods: {
     handleGetList() {
       getList().then(res => {
-        this.oneList = res.data.data[0].Multipleunit || []
+        this.oneList = res.data.data[0].Specialine || [],
+        this.carsList = res.data.data[0].Multipleunit || []
       })
     },
     handleClick(tab, event) { },
@@ -135,7 +134,7 @@ export default {
       this.$refs.currentList.validate(val => {
         if (!val) return
         request({
-          url: '/wsg/multi',
+          url: '/wsg/spline',
           method: 'POST',
           data: {
             ...this.currentList
@@ -148,16 +147,22 @@ export default {
           })
           this.dialog = false
         })
+
+        // this.currentList = {
+        //   ...this.currentList,
+        //   id: Date.now()
+        // }
+        // this.oneList.push(this.currentList)
       })
     },
     deleteList(id) {
-      this.$confirm('此操作将删除该动车组, 是否继续?', '提示', {
+      this.$confirm('此操作将删除该曲线，是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         request({
-          url: `/wsg/deleteByMu/${id}`,
+          url: `/wsg/deleteBySpline/${id}`,
           data: {}
         }).then(() => {
           this.handleGetList()
@@ -179,6 +184,9 @@ export default {
   font-weight: bold;
   font-size: 18px;
   margin-bottom: 15px;
+}
+/deep/.el-select{
+  width: 100%;
 }
 .title::before{
   content: '';

@@ -7,13 +7,13 @@
       style="width: 100%;">
       <el-table-column
         prop="slrfnbr"
-        label="ID号"
+        label=""
         align="center"
         min-width="15%">
       </el-table-column>
       <el-table-column
         prop="murfhbr"
-        label="所属动车组"
+        label="保护区长度"
         align="center"
         min-width="15%">
         <template slot-scope="scope">
