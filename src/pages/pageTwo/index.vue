@@ -48,8 +48,8 @@
         <div class="title">车站</div>
         <div class="my-input">
           <div>
-            <span style="width: 150px; display: inline-block">车站停车距离(m): </span>
-            <el-input v-model="baseInfo3.stationLength" placeholder="请输入车站停车距离"></el-input>
+            <span style="width: 150px; display: inline-block">车站停车时间: </span>
+            <el-input v-model="baseInfo3.stationLength" placeholder="请输入车站停车时间"></el-input>
           </div>
           <div>
             <span style="width: 150px; display: inline-block">保护区距离(m): </span>
