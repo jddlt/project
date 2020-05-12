@@ -66,10 +66,14 @@
       <div class="car car1" :style="car1">前车</div>
       <div class="car car2" :style="car2">后车</div>
     </div>
+    <div class="echart-show">
+      <chart width="500px" :options="options"></chart>
+    </div>
   </div>
 </template>
 
 <script>
+import myOptions from './options'
 export default {
   components: {},
   data() {
@@ -78,7 +82,20 @@ export default {
       car1: { left: '300px', bottom: '15px' },
       car2: { left: '0', bottom: '15px' },
       roadWidth: 1000,
-      type: 0
+      type: 0,
+      options: {
+        // xAxis: {
+        //   type: 'category',
+        //   data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        // },
+        // yAxis: {
+        //   type: 'value'
+        // },
+        // series: [{
+        //   data: [820, 932, 901, 934, 1290, 1330, 1320],
+        //   type: 'line'
+        // }]
+      }
     };
   },
   watch: {
@@ -117,6 +134,7 @@ export default {
       let speed2 = 5
       style1.left = '300px'
       style2.left = '0'
+      this.options = myOptions.options5
       this.timer4 = setInterval(() => {
         if (parseFloat(style1.left) >= 850) {
           if (speed2 <= 0) {
@@ -142,6 +160,7 @@ export default {
       let car1Speed = 5
       let car2Speed = 5
       if (v1 && !v2) {
+        this.options = myOptions.options1
         this.timer = setInterval(() => {
           if (parseInt(this.car1.left) >= this.roadWidth - 100) { 
             clearInterval(this.timer) 
@@ -158,7 +177,7 @@ export default {
           }
         }, 20)
       } else {
-        if (v1 > v2) { car1Speed += 3 } else if (v1 < v2) { car2Speed += 3 }
+        if (v1 > v2) { car1Speed += 3; this.options = myOptions.options3 } else if (v1 < v2) { car2Speed += 3; this.options = myOptions.options4 } else {; this.options = myOptions.options2}
         this.timer = setInterval(() => {
           if ((car2Speed).toFixed(1) > 5) { car2Speed -= 0.05 }
           this.car1.left = (parseInt(this.car1.left) + car1Speed) + 'px'
@@ -174,6 +193,7 @@ export default {
       const baseSpeed = 5
       let car1Speed = 3
       let car2Speed = 3
+      this.options = myOptions.options6
       this.timer = setInterval(() => {
         if ( parseInt(this.car2.left) >= 650 ) { this.car2.left = '650px' } else {
           this.car2.left = (parseInt(this.car2.left) + car2Speed) + 'px'
@@ -196,6 +216,7 @@ export default {
       const style2 = this.car2
       let speed1 = 6
       let speed2 = 3
+       this.options = myOptions.options7
       this.timer = setInterval(() => {
         // car2
         if (parseInt(style2.left) >= (this.roadWidth/2 - 100)) { 
@@ -332,6 +353,11 @@ export default {
 
 
 <style scoped>
+.echart-show{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
 .a{
   position: absolute;
   bottom: -30px;
