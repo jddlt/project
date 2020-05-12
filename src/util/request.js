@@ -1,7 +1,7 @@
 // const axios = require('axios')
 import axios from 'axios'
 
-let baseUrl = 'http://3087a4l620.zicp.vip'
+let baseUrl = 'http://localhost:8095/wsg_manager_web'
 
 export function request ({url = '', method, data = {}}) {
     return axios({
@@ -15,7 +15,7 @@ export function request ({url = '', method, data = {}}) {
 
 export function getList () {
     return axios({
-        url: 'http://3087a4l620.zicp.vip/wsg/findAll',
+        url: 'http://localhost:8095/wsg_manager_web/wsg/findAll',
         method: 'GET'
     })
 }
