@@ -1,54 +1,65 @@
 export default {
   options1: {
     xAxis: {
-      type: 'category',
+      type: 'value',
       data: [],
       boundaryGap: false,
-      name: 't/s'
+      name: 't/s',
+      splitLine:{show: false},
+      axisTick: {
+        show: false
+      }
     },
     yAxis: {
-      type: 'category',
-      name: 'V(m/s)'
+      type: 'value',
+      data: [],
+      name: 'V(m/s)',
+      splitLine:{show: false}
     },
     series: [{
-      data: ['V1', 'V1'],
+      data: [
+        [0, 0],
+        [11,11],
+        [20.2,22.2],
+        [30,22.2],
+      ],
       type: 'line'
     }]
   },
-  options2: {
-    xAxis: {
-      type: 'category',
-      data: [],
-      boundaryGap: false,
-      name: 't/s'
-    },
-    yAxis: {
-      type: 'category',
-      name: 'V(m/s)'
-    },
-    series: [{
-      data: ['V1 / V2', 'V1 / V2'],
-      type: 'line'
-    }]
-  },
+  options2: this.options1,
   options3: {
     xAxis: {
-      type: 'category',
+      type: 'value',
       data: [],
       boundaryGap: false,
-      name: 't/s'
+      name: 't/s',
+      splitLine:{show: false},
+      axisTick: {
+        show: false
+      }
     },
     yAxis: {
-      type: 'category',
-      name: 'V(m/s)'
+      type: 'value',
+      data: [],
+      name: 'V(m/s)',
+      splitLine:{show: false}
     },
     series: [
       {
-        data: ['V1', 'V1'],
+        data: [
+          [0, 0],
+          [11,11],
+          [20.2,22.2],
+          [30,22.2]
+        ],
         type: 'line'
       },
       {
-        data: ['V2', 'V2'],
+        data: [
+          [0, 0],
+          [11,11],
+          [30,11]
+        ],
         type: 'line'
       }
     ]
